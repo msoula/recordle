@@ -78,6 +78,8 @@ client.on('messageCreate', function(message) {
                             if (isNaN(score)) {
                                 score = 0;
                             }
+                            // clamp score
+                            score = Math.min(Math.max(0, score), 6);
 
                             var scoreGameEntries = scoreByGames[parser.prefix];
                             if (!scoreGameEntries) {
