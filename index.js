@@ -85,9 +85,9 @@ client.on('messageCreate', function(message) {
                                 scoreByGames[parser.prefix] = scoreGameEntries;
                             }
 
-                            var scoreGameUser = scoreGameEntries.find(entry => entry.user === msg.author.username);
+                            var scoreGameUser = scoreGameEntries.find(entry => entry.author.username === msg.author.username);
                             if (!scoreGameUser) {
-                                scoreGameUser = {user: msg.author.username, score: 0};
+                                scoreGameUser = {author: msg.author, score: 0};
                                 scoreGameEntries.push(scoreGameUser);
                             }
                             scoreGameUser.score += SCORE_VALUES[score];
@@ -119,7 +119,7 @@ client.on('messageCreate', function(message) {
                         case 1: emoji = ':second_place:'; break;
                         case 2: emoji = ':third_place:'; break;
                     }
-                    results += `  ${emoji} ${entry.user} (${entry.score} points)\n`;
+                    results += `  ${emoji} @${entry.author.username}#${entry.author.discriminator} (${entry.score} points)\n`;
                 });
                 results += '\n';
             });
