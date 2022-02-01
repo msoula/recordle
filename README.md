@@ -4,8 +4,9 @@
 
 Recordle is a bot that weekly reports Wordle-like games scores shared on a Discord channel.
 
-Just type `!recordle` in the channel and get results!
+## How to use it
 
+Just type `!recordle` in the channel where you share your Wordle parties and get the results! Be aware that the command will be deleted from the channel to prevent flooding.
 
 For now, 5 games are available:
   * [Wordle](https://www.powerlanguage.co.uk/wordle/),
@@ -13,6 +14,8 @@ For now, 5 games are available:
   * [SUTOM](https://sutom.nocle.fr/),
   * [LeMOT](https://www.solitaire-play.com/lemot/),
   * [MOTDLE](https://motdle.herokuapp.com/).
+
+You may also PM the bot for the results on a specific channel you are registered to. Just type `!recordle <CHANNEL_NAME>` where `<CHANNEL_NAME>` is the channel's name without `#`.
 
 ## Setup
 
