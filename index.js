@@ -51,7 +51,7 @@ function formatDate(date) {
 
 const client = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES']});
 client.on('messageCreate', function(message) {
-    if (!message.content.startsWith('!recordle')) return;
+    if (!message.content.toLowerCase().startsWith('!recordle')) return;
     if (message.author.bot) return;
 
     let scoreByGames = {};
