@@ -7,11 +7,11 @@ const BOT_NAME = 'recordle';
 const SCORE_VALUES = [0, 100, 50, 25, 10, 5, 1];
 
 const GAME_PARSERS = [
-    {prefix: 'Wordle', regex: /Wordle .*#?\d+ (.+)\/6/},
-    {prefix: 'Le Mot', regex: /Le Mot .*#?\d+ (.+)\/6/},
-    {prefix: 'SUTOM', regex: /SUTOM .*#?\d+ (.+)\/6/},
-    {prefix: '(bêta) LeMOT', regex: /\(bêta\) LeMOT .*#?\d+ (.+)\/6/},
-    {prefix: 'MOTDLE', regex: /MOTDLE .*#?\d+ - (.+)\/6/}
+    {prefix: 'Wordle', regex: /Wordle .*#?\d+ (.+)\/6/, url: 'https://www.powerlanguage.co.uk/wordle/'},
+    {prefix: 'Le Mot', regex: /Le Mot .*#?\d+ (.+)\/6/, url: 'https://wordle.louan.me/'},
+    {prefix: 'SUTOM', regex: /SUTOM .*#?\d+ (.+)\/6/, url: 'https://sutom.nocle.fr/'},
+    {prefix: '(bêta) LeMOT', regex: /\(bêta\) LeMOT .*#?\d+ (.+)\/6/, url: 'https://www.solitaire-play.com/lemot/'},
+    {prefix: 'MOTDLE', regex: /MOTDLE .*#?\d+ - (.+)\/6/, url: 'https://motdle.herokuapp.com/'}
 ];
 const MESSAGES_LIMIT = 50;
 
@@ -49,28 +49,70 @@ function formatDate(date) {
     return str;
 }
 
-const client = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES']});
-client.on('messageCreate', function(message) {
-    if (!message.content.toLowerCase().startsWith('!recordle')) return;
-    if (message.author.bot) return;
+function formatError(str) {
+    return `\`\`\`diff\n- ${str}\n\`\`\``;
+}
 
-    let scoreByGames = {};
-    let monday = getMonday();
-    let nextMonday = new Date(monday);
-    nextMonday.setDate(nextMonday.getDate() + 7);
+function formatWeeklyRecords(author, records) {
+    var results = '';
+    results += `Scores for the week on <#${records.channel.id}> (from ${formatDate(records.from)} to ${formatDate(records.to)})\n\n`;
 
-    let messagesManager = message.channel.messages;
-    let lastMessageId = message.id;
+    var hasWonOnce = false;
+
+    // TODO(msoula): adapt message to the channel's guild locale
+
+    if (Object.keys(records.byGames).length) {
+        GAME_PARSERS.forEach((parser, idx) => {
+            var scoreGameEntries = records.byGames[parser.prefix];
+            if (!scoreGameEntries || !scoreGameEntries.length) return;
+
+            results += `***${parser.prefix}*** (<${parser.url}>) :\n`;
+            scoreGameEntries.sort((a, b) => b.score - a.score);
+            scoreGameEntries.forEach((entry, idx) => {
+                let emoji = ' ';
+                switch(idx) {
+                    case 0: emoji = ':first_place:'; break;
+                    case 1: emoji = ':second_place:'; break;
+                    case 2: emoji = ':third_place:'; break;
+                }
+                results += `  ${emoji} <@${entry.author.id}> (${entry.score} points)\n`;
+
+                hasWonOnce |= 0 === idx && entry.author.id === author.id;
+            });
+            results += '\n';
+        });
+    } else {
+        results += `___No wordle party played___\n`;
+    }
+
+    if (hasWonOnce) {
+        results += 'You are a real hero !!!!\n'
+    }
+
+    return results.slice(0, -1);
+}
+
+function getWeeklyRecordsFromChannel(channel, from, to, callback) {
+
+    let messagesManager = channel.messages;
     let passedMonday = false;
+    let lastMessageId;
+
+    let weeklyScores = {
+        channel: channel,
+        from: from,
+        to  : to,
+        byGames: {}
+    };
 
     async.doWhilst(
         (callback) => {
             messagesManager.fetch({before: lastMessageId, limit: MESSAGES_LIMIT}).then(messages => {
-                messages.forEach(msg => {
-                    if (BOT_NAME === msg.author.username) return;
+                messages.forEach(message => {
+                    if (BOT_NAME === message.author.username) return;
 
-                    if (monday < msg.createdAt) {
-                        msg.content.split('\n').forEach(line => {
+                    if (from < message.createdAt) {
+                        message.content.split('\n').forEach(line => {
                             let parser = GAME_PARSERS.find(parser => line.startsWith(parser.prefix));
                             if (!parser) return;
 
@@ -81,15 +123,15 @@ client.on('messageCreate', function(message) {
                             // clamp score
                             score = Math.min(Math.max(0, score), 6);
 
-                            var scoreGameEntries = scoreByGames[parser.prefix];
+                            var scoreGameEntries = weeklyScores.byGames[parser.prefix];
                             if (!scoreGameEntries) {
                                 scoreGameEntries = [];
-                                scoreByGames[parser.prefix] = scoreGameEntries;
+                                weeklyScores.byGames[parser.prefix] = scoreGameEntries;
                             }
 
-                            var scoreGameUser = scoreGameEntries.find(entry => entry.author.username === msg.author.username);
+                            var scoreGameUser = scoreGameEntries.find(entry => entry.author.username === message.author.username);
                             if (!scoreGameUser) {
-                                scoreGameUser = {author: msg.author, score: 0};
+                                scoreGameUser = {author: message.author, score: 0};
                                 scoreGameEntries.push(scoreGameUser);
                             }
                             scoreGameUser.score += SCORE_VALUES[score];
@@ -98,38 +140,103 @@ client.on('messageCreate', function(message) {
                         passedMonday = true;
                     }
                 });
-                lastMessageId = messages.at(messages.size - 1).id;
+
+                if (0 < messages.size) {
+                    lastMessageId = messages.at(messages.size - 1).id;
+                }
                 callback(null, messages.size);
             });
         },
         (size, callback) => callback(null, size === MESSAGES_LIMIT && !passedMonday),
-        (err) => {
-            var results = '';
-            results += `Scores for the week (from ${formatDate(monday)} to ${formatDate(nextMonday)})\n`;
-            results += '-----------------------\n\n';
-            GAME_PARSERS.forEach((parser, idx) => {
-                var scoreGameEntries = scoreByGames[parser.prefix];
-                if (!scoreGameEntries || !scoreGameEntries.length) return;
-
-                results += `${parser.prefix} :\n`;
-                results += '-----------------------\n';
-                scoreGameEntries.sort((a, b) => b.score - a.score);
-                scoreGameEntries.forEach((entry, idx) => {
-                    let emoji = ' ';
-                    switch(idx) {
-                        case 0: emoji = ':first_place:'; break;
-                        case 1: emoji = ':second_place:'; break;
-                        case 2: emoji = ':third_place:'; break;
-                    }
-                    results += `  ${emoji} @${entry.author.username}#${entry.author.discriminator} (${entry.score} points)\n`;
-                });
-                results += '\n';
-            });
-            message.author.send(results.slice(0, -1));
-        }
+        (err) => callback(err, weeklyScores)
     );
+}
+
+function getWeeklyRecordsFromChannels(channels, callback) {
+    let results = [];
+
+    let monday = getMonday();
+    let nextMonday = new Date(monday);
+    nextMonday.setDate(nextMonday.getDate() + 7);
+
+    async.each(channels, (channel, callback) => {
+        getWeeklyRecordsFromChannel(channel, monday, nextMonday, (err, result) => {
+            if (err) { return callback(err); }
+            results.push(result);
+            callback();
+        });
+    }, (err) => callback(err, results));
+}
+
+const client = new Discord.Client({
+    // partial configuration required to enable direct messages
+    partials: ["CHANNEL", "MESSAGE"],
+    intents: ['GUILDS', 'GUILD_MESSAGES', 'DIRECT_MESSAGES']
+});
+client.on('messageCreate', function(message) {
+    if (!message.content.toLowerCase().startsWith('!recordle')) return;
+    if (message.author.bot) return;
+
+    let deleteMessage = false;
+
+    if ('DM' === message.channel.type) {
+        // check command is valid
+        var command = message.content.toLowerCase().trim();
+        if (!/^!recordle [^\s]+$/.test(command)) {
+            return message.author.send(formatError('Sorry, invalid syntax (you should use `!recordle channel_name`)'));
+        }
+
+        // find channels by name
+        let channel_name = command.replace(/^!recordle ([^\s]+)$/, '$1');
+        let channels_found = client.channels.cache.filter(channel => 'GUILD_TEXT' === channel.type && channel.name.toLowerCase() === channel_name);
+
+        // assert author belongs to guild of the channel
+        let channels = [];
+        async.each(channels_found.values(), (channel, callback) => {
+            channel.guild.members.fetch(message.author.id)
+            .then(member => {
+                if (member) {
+                    channels.push(channel);
+                }
+                callback(null);
+            })
+            .catch(err => {
+                if (404 !== err.httpStatus) { return callback(err); }
+                callback(null);
+            });
+        }, (err) => {
+            if (err) {
+                console.error(err);
+                return message.author.send(formatError(`Sorry, cannot get weekly record from channels named ${channel_name}`));
+            }
+            if (!channels.length) {
+                return message.author.send(formatError(`Sorry, you're not registered on any channel named ${channel_name}`));
+            }
+
+            getWeeklyRecordsFromChannels(channels, (err, results) => {
+                if (err) {
+                    return message.author.send(formatError(`Sorry, cannot get weekly record from channels named ${channel_name}`));
+                }
+
+                results.forEach(entry => message.author.send(formatWeeklyRecords(message.author, entry)));
+            });
+        });
+
+    } else {
+        getWeeklyRecordsFromChannels([message.channel], (err, results) => {
+            if (err) {
+                console.error(err);
+                return message.author.send(formatError(`Sorry, cannot get weekly record from channel <#${message.channel.name}>`));
+            }
+
+            results.forEach(entry => message.author.send(formatWeeklyRecords(message.author, entry)));
+
+            // delete the message from channel
+            message.delete().then(() => {}).catch(console.error);
+        });
+    }
+
 });
 client.login(process.env.BOT_TOKEN);
-
 
 // vim: set ts=4 sw=4 expandtab:
