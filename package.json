@@ -14,5 +14,10 @@
   },
   "engines": {
     "node": "16.x"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.2",
+    "gulp-livereload": "^4.0.2",
+    "gulp-nodemon": "^2.5.0"
   }
 }
