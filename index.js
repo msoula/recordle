@@ -75,7 +75,11 @@ function formatWeeklyRecords(author, records) {
                     case 1: emoji = ':second_place:'; break;
                     case 2: emoji = ':third_place:'; break;
                 }
-                results += `  ${emoji} <@${entry.author.id}> (${entry.score} points)\n`;
+                if (entry.author.id === author.id) {
+                    results += `  ${emoji} <@${entry.author.id}> (${entry.score} points)\n`;
+                } else {
+                    results += `  ${emoji} ${entry.author.username} (${entry.score} points)\n`;
+                }
 
                 hasWonOnce |= 0 === idx && entry.author.id === author.id;
             });
