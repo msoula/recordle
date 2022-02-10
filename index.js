@@ -11,7 +11,8 @@ const GAME_PARSERS = [
     {prefix: 'Le Mot', regex: /Le Mot .*#?\d+ (.+)\/6/, url: 'https://wordle.louan.me/'},
     {prefix: 'SUTOM', regex: /SUTOM .*#?\d+ (.+)\/6/, url: 'https://sutom.nocle.fr/'},
     {prefix: '(bêta) LeMOT', regex: /\(bêta\) LeMOT .*#?\d+ (.+)\/6/, url: 'https://www.solitaire-play.com/lemot/'},
-    {prefix: 'MOTDLE', regex: /MOTDLE .*#?\d+ - (.+)\/6/, url: 'https://motdle.herokuapp.com/'}
+    {prefix: 'MOTDLE', regex: /MOTDLE .*#?\d+ - (.+)\/6/, url: 'https://motdle.herokuapp.com/'},
+    {prefix: 'voxdle', regex: /voxdle .*#?\d+ (.+)\/6/, url: 'https://voxdle.u2042.com/'}
 ];
 const MESSAGES_LIMIT = 50;
 
