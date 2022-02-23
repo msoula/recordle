@@ -14,7 +14,7 @@ const GAME_PARSERS = [
     {prefix: 'MOTDLE', regex: /MOTDLE .*#?\d+ - (.+)\/6/, url: 'https://motdle.herokuapp.com/'},
     {prefix: 'voxdle \ud83c\uddeb\ud83c\uddf7', regex: /voxdle \ud83c\uddeb\ud83c\uddf7 .*#?\d+ (.+)\/6/, url: 'https://voxdle.u2042.com/'},
     {prefix: 'voxdle \ud83c\uddec\ud83c\udde7', regex: /voxdle \ud83c\uddec\ud83c\udde7.*#?\d+ (.+)\/6/, url: 'https://voxdle.u2042.com/'},
-    {prefix: 'Worldle', regex: /Worldle .*#?\d+ (.+)\/6/, url: 'https://worldle.teuteuf.fr/'}
+    {prefix: '#Worldle', regex: /Worldle .*#?\d+ (.+)\/6/, url: 'https://worldle.teuteuf.fr/'}
 ];
 const MESSAGES_LIMIT = 50;
 
