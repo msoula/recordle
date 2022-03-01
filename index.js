@@ -8,6 +8,7 @@ const SCORE_VALUES = [0, 100, 50, 25, 10, 5, 1];
 
 const GAME_PARSERS = [
     {prefix: 'Wordle', regex: /Wordle .*#?\d+ (.+)\/6/, url: 'https://www.powerlanguage.co.uk/wordle/'},
+    {prefix: 'brezhle', regex: /brezhle .*#?\d+ (.+)\/6/, url: 'https://brezhle.u2042.com/'},
     {prefix: 'Le Mot', regex: /Le Mot .*#?\d+ (.+)\/6/, url: 'https://wordle.louan.me/'},
     {prefix: 'SUTOM', regex: /SUTOM .*#?\d+ (.+)\/6/, url: 'https://sutom.nocle.fr/'},
     {prefix: 'LeMOT', regex: /LeMOT .*#?\d+ (.+)\/6/, url: 'https://www.solitaire-play.com/lemot/'},
@@ -123,9 +124,14 @@ function getWeeklyRecordsFromChannel(channel, from, to, callback) {
                             let parser = GAME_PARSERS.find(parser => line.startsWith(parser.prefix));
                             if (!parser) return;
 
-                            var score = parseInt(line.replace(parser.regex, '$1'));
-                            if (isNaN(score)) {
-                                score = 0;
+                            var score = 0;
+
+                            var match = parser.regex.exec(line);
+                            if (1 < match.length) {
+                                score = parseInt(match[1]);
+                                if (isNaN(score)) {
+                                    score = 0;
+                                }
                             }
                             // clamp score
                             score = Math.min(Math.max(0, score), 6);
