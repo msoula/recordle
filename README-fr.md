@@ -8,12 +8,16 @@ Recordle est un bot qui produit des récapitulatifs hebdomadaires de scores de j
 
 Il suffit juste de saisir `!recordle` dans le salon où vous partagez vos parties de Wordle pour obtenir les résultats ! Le bot se chargera de supprimer la commande afin d'éviter de trop surcharger les logs.
 
-Pour l'instant, 5 jeux sont disponibles :
+Pour l'instant, 9 jeux sont disponibles :
   * [Wordle](https://www.powerlanguage.co.uk/wordle/),
+  * [brezhle](https://brezhle.u2042.com/),
   * [Le Mot](https://wordle.louan.me/),
   * [SUTOM](https://sutom.nocle.fr/),
   * [LeMOT](https://www.solitaire-play.com/lemot/),
+  * [LeMOT6](https://www.solitaire-play.com/lemot6/),
   * [MOTDLE](https://motdle.herokuapp.com/).
+  * [voxdle](https://voxdle.u2042.com/),
+  * [Worldle](https://worldle.teuteuf.fr/),
 
 Il est aussi possible d'envoyer un MP au bot pour obtenir les résultats d'un salon précis sur lequel vous êtes inscrits. Pour cela, il suffit de saisir `!recordle <NOM_DU_SALON>` où `<NOM_DU_SALON>` est le nom du salon sans `#`.
 

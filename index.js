@@ -11,6 +11,7 @@ const GAME_PARSERS = [
     {prefix: 'brezhle', regex: /brezhle .*#?\d+ (.+)\/6/, url: 'https://brezhle.u2042.com/'},
     {prefix: 'Le Mot', regex: /Le Mot .*#?\d+ (.+)\/6/, url: 'https://wordle.louan.me/'},
     {prefix: 'SUTOM', regex: /SUTOM .*#?\d+ (.+)\/6/, url: 'https://sutom.nocle.fr/'},
+    {prefix: 'LeMOT6', regex: /LeMOT6 .*#?\d+ (.+)\/6/, url: 'https://www.solitaire-play.com/lemot6/'},
     {prefix: 'LeMOT', regex: /LeMOT .*#?\d+ (.+)\/6/, url: 'https://www.solitaire-play.com/lemot/'},
     {prefix: 'MOTDLE', regex: /MOTDLE .*#?\d+ - (.+)\/6/, url: 'https://motdle.herokuapp.com/'},
     {prefix: 'voxdle \ud83c\uddeb\ud83c\uddf7', regex: /voxdle \ud83c\uddeb\ud83c\uddf7 .*#?\d+ (.+)\/6/, url: 'https://voxdle.u2042.com/'},
@@ -127,6 +128,7 @@ function getWeeklyRecordsFromChannel(channel, from, to, callback) {
                             var score = 0;
 
                             var match = parser.regex.exec(line);
+                            if (!match) return;
                             if (1 < match.length) {
                                 score = parseInt(match[1]);
                                 if (isNaN(score)) {

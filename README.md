@@ -8,12 +8,16 @@ Recordle is a bot that weekly reports Wordle-like games scores shared on a Disco
 
 Just type `!recordle` in the channel where you share your Wordle parties and get the results! Be aware that the command will be deleted from the channel to prevent flooding.
 
-For now, 5 games are available:
+For now, 9 games are available:
   * [Wordle](https://www.powerlanguage.co.uk/wordle/),
+  * [brezhle](https://brezhle.u2042.com/),
   * [Le Mot](https://wordle.louan.me/),
   * [SUTOM](https://sutom.nocle.fr/),
   * [LeMOT](https://www.solitaire-play.com/lemot/),
+  * [LeMOT6](https://www.solitaire-play.com/lemot6/),
   * [MOTDLE](https://motdle.herokuapp.com/).
+  * [voxdle](https://voxdle.u2042.com/),
+  * [Worldle](https://worldle.teuteuf.fr/),
 
 You may also PM the bot for the results on a specific channel you are registered to. Just type `!recordle <CHANNEL_NAME>` where `<CHANNEL_NAME>` is the channel's name without `#`.
 
